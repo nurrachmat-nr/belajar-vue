@@ -36,14 +36,18 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     const isAuthenticated = store.getters["auth/isAuthenticated"];
-    if(to.name != 'login' && !isAuthenticated) next({name: "login"})
-    else next();
+    if(to.name != 'login' && !isAuthenticated) {
+        next({name: "login"})
+    } else {
+        //store.dispatch("auth/AuthMe");
+        next();
+    }
 });
 
-/*router.afterEach((to, from, next) => {
+/*router.afterEach((next) => {
     const isAuthenticated = store.getters["auth/isAuthenticated"];
-    if(to.name != 'login' && !isAuthenticated) next({name: "login"})
-    else next();
+    if(isAuthenticated) store.dispatch("auth/AuthMe");
+    next();
 })*/
 
 export default router;

@@ -46,8 +46,10 @@
 </template>
 
 <script>
-import axios from 'axios'
+//import axios from 'axios'
 import { onMounted, ref } from '@vue/runtime-core';
+//import { useStore } from 'vuex';
+import HTTP from "@/service/HTTP"
 export default {
     name: "",
     props: {
@@ -65,32 +67,45 @@ export default {
         //reactive
         let posts = ref([]);
         let pesandelete = ref();
+        //const store =  useStore();
         onMounted(() => {
-            /*axios.get('http://localhost:8000/api/post')
+            /*let config = {
+                method: 'get',
+                url: 'http://localhost:8000/api/post',
+                headers: { 
+                    'Accept': 'application/vnd.api+json', 
+                    'Authorization': 'Bearer '+ store.getters['auth/getToken']
+                }
+            };
+            axios(config)
             .then(response => {
                 posts.value = response.data.data
             }).catch(error => {
                  console.log(error.response.data)
             })*/
 
-            var requestOptions = {
+            HTTP.get("/post").then(response => {
+                posts.value = response.data.data
+            }).catch(error => {
+                console.log(error.response.data)
+            })
+
+            /*var requestOptions = {
                 method: 'GET',
                 redirect: 'follow'
-            };
+            };*/
 
-            fetch("http://localhost:8000/api/post", requestOptions)
+            /*fetch("http://localhost:8000/api/post", requestOptions)
                 .then(response => response.json())
                 .then(result => {
                     posts.value = result.data
                 })
-                .catch(error => console.log('error', error));
+                .catch(error => console.log('error', error));*/
         });
 
         //method delete
        function postDelete(id) {
-            //delete data post by ID
-            axios.delete(`http://localhost:8000/api/post/${id}`)
-            .then((result) => {                        
+           HTTP.delete("/post/" + id).then((result) => {                        
                 //splice posts 
                 posts.value.splice(posts.value.indexOf(id), 1);
                 pesandelete.value = result.data.message;
@@ -98,6 +113,16 @@ export default {
                 }).catch(error => {
                     console.log(error.response.data)
                 })
+            //delete data post by ID
+            /*axios.delete(`http://localhost:8000/api/post/${id}`)
+            .then((result) => {                        
+                //splice posts 
+                posts.value.splice(posts.value.indexOf(id), 1);
+                pesandelete.value = result.data.message;
+                console.log(pesandelete);
+                }).catch(error => {
+                    console.log(error.response.data)
+                })*/
         }
 
         return {

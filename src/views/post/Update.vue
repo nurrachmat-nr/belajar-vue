@@ -40,6 +40,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios';
+import { useStore } from 'vuex';
 export default {
     setup(){
         const post  = reactive({
@@ -50,9 +51,18 @@ export default {
         const validation = ref([]);
         const router =  useRouter();
         const route = useRoute();
+        const store =  useStore();
 
-         onMounted(() => {
-            axios.get('http://localhost:8000/api/post/' + route.params.id)
+        onMounted(() => {
+             let config = {
+                method: 'get',
+                url: 'http://localhost:8000/api/post/'  + route.params.id,
+                headers: { 
+                    'Accept': 'application/vnd.api+json', 
+                    'Authorization': 'Bearer '+ store.getters['auth/getToken']
+                }
+            };
+            axios(config)
             .then(response => {
                 post.title = response.data.data.title
                 post.content = response.data.data.content
@@ -61,8 +71,18 @@ export default {
             })
         });
 
+       
         function update(){
-            axios.put('http://localhost:8000/api/post/' + route.params.id, post).then(() => {
+             let config = {
+                method: 'put',
+                url: 'http://localhost:8000/api/post/' + route.params.id,
+                headers: { 
+                    'Accept': 'application/vnd.api+json', 
+                    'Authorization': 'Bearer '+ store.getters['auth/getToken']
+                },
+                data: post
+            };
+            axios(config).then(() => {
                  router.push({
                      name: 'post.index'
                  })

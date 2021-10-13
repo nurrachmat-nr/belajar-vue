@@ -1,4 +1,6 @@
 import axios from "axios";
+import router from "../router";
+import HTTP from "../service/HTTP";
 
 const state = () => {
     return {
@@ -6,6 +8,7 @@ const state = () => {
         username: "",
         role: "",
         division: null,
+        jk: ""
     }
 }
 //dipanggil menggunaan commit
@@ -17,6 +20,15 @@ const mutations = {
         state.username = data.username;
         state.role = data.role;
         state.division = data.division.name;
+    },
+    clearState: (state) =>{
+        state.token = "";
+        state.username = "";
+        state.role = "";
+        state.division = null;
+    },
+    setJK: (state, jk) => {
+        state.jk = jk;
     }
 }
 
@@ -25,16 +37,16 @@ const getters = {
     getUsername: state => state.username,
     getRole: state => state.role,
     getDivision: state => state.division,
-    isAuthenticated: state => {
-        state.token.length > 0
-    }
+    isAuthenticated: state => state.token.length > 0 ||  state.token != ""
 }
 
 //dipanggil menggunakan dispatch
 const actions = {
-    LogIn({commit}, user){
-        axios.post('http://localhost:8000/auth/login', user).then(response => {
+    LogIn({commit, dispatch}, user){
+        axios.post('http://localhost:8000/api/auth/login', user).then(response => {
                 commit("setToken", response.data);
+                dispatch("AuthMe");
+                router.push({name: 'hallo'});
             }).catch(error => {
                 console.log(error);    
             })
@@ -45,7 +57,7 @@ const actions = {
             url: 'http://localhost:8000/api/auth/me',
             headers: { 
               'Accept': 'application/vnd.api+json', 
-              'Authorization': 'Bearer '+ getters.getToken()
+              'Authorization': 'Bearer '+ getters.getToken
             }
           };
           
@@ -56,6 +68,14 @@ const actions = {
           .catch(function (error) {
             console.log(error);
           });
+    },
+    LogOut({commit}){
+        HTTP.post("/auth/logout", {}).then(() => {
+            commit("clearState");
+            router.push({name: 'login'});
+        }).catch(() => {
+            console.log("Logout Gagal");
+        })        
     }
 }
 

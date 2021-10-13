@@ -4,12 +4,13 @@
         <nav class="nav">
             <router-link class="nav-link active" aria-current="page" :to="{name:'hallo'}">Home</router-link>
             <router-link class="nav-link" :to="{name:'post.index'}">Post</router-link>
-            <a class="nav-link" href="#">Login</a>
+            <a class="nav-link" href="#" @click="logout">Log Out</a>
         </nav>
     </div>
 </template>
 
 <script>
+import { useStore } from 'vuex'
 export default {
     name: "NavMenu",
     props: {
@@ -18,6 +19,12 @@ export default {
     data() {
         return {
             nama: ""
+        }
+    },
+    setup(){
+        const store = useStore()
+        return{
+            logout : () => store.dispatch("auth/LogOut")
         }
     }
 }
